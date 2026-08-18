@@ -22,7 +22,7 @@ const highlights = [
     value: 'React.js Developer',
   },
   {
-    label: 'Location',
+    label: 'Current Location',
     value: 'Mohali, Punjab',
   },
 ]
