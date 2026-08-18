@@ -74,7 +74,7 @@
 .nav-links a {
   color: var(--text-muted);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
   padding: 8px 10px;
   border-radius: 6px;
@@ -83,6 +83,12 @@
 .nav-links a:hover {
   color: var(--text-strong);
   background: #eef6ff;
+}
+
+.nav-links a.is-active {
+  color: var(--text-strong);
+  font-weight: 900;
+   background: #eef6ff;
 }
 
 .hero-section {
@@ -400,11 +406,8 @@
 }
 
 .section-heading {
-  display: grid;
-  grid-template-columns: 0.38fr 1fr;
-  gap: 42px;
-  align-items: start;
-  margin-bottom: 34px;
+  text-align: center;
+  margin-bottom: 34px;  
 }
 
 .section h2,
@@ -413,9 +416,7 @@
 }
 
 .about-section {
-  display: grid;
-  grid-template-columns: 0.38fr 1fr;
-  gap: 42px;
+  text-align: center;
 }
 
 .about-section .section-heading {
@@ -425,10 +426,10 @@
 
 .about-section > p,
 .contact-section p {
-  margin: 0;
+  margin-top: 10;
   color: var(--text-muted);
   font-size: 19px;
-  line-height: 1.75;
+  line-height: 1.4;
 }
 
 .experience-card,
@@ -879,10 +880,7 @@
 }
 
 .resume-strip {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 30px;
-  align-items: center;
+  text-align: center;
   width: min(1160px, calc(100% - 40px));
   margin: 0 auto 92px;
   padding: 34px;
@@ -901,7 +899,6 @@
 }
 
 .resume-strip p:last-child {
-  max-width: 720px;
   margin: 14px 0 0;
   color: var(--text-muted);
   line-height: 1.7;
@@ -910,8 +907,9 @@
 .resume-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 12px;
+  margin-top: 10px;
 }
 
 .contact-section {

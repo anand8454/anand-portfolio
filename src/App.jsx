@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import heroImg from './assets/hero.png'
 import './App.css'
 
@@ -141,11 +141,22 @@ const coreStrengths = [
   'Performance optimization',
 ]
 
+const navItems = [
+  { label: 'Experience', sectionId: 'experience' },
+  { label: 'Projects', sectionId: 'projects' },
+  { label: 'Skills', sectionId: 'skills' },
+  { label: 'Education', sectionId: 'education' },
+  { label: 'Resume', sectionId: 'resume' },
+  { label: 'Contact', sectionId: 'contact' },
+]
+
 function App() {
   const [activeProject, setActiveProject] = useState(projects[0].title)
   const [projectFilter, setProjectFilter] = useState('All')
   const [activeSkill, setActiveSkill] = useState(skillGroups[0].title)
+  const [activeSection, setActiveSection] = useState('home')
   const [scrollProgress, setScrollProgress] = useState(0)
+  const scrollSyncPausedUntilRef = useRef(0)
 
   const projectFilters = useMemo(
     () => ['All', ...new Set(projects.map((project) => project.category))],
@@ -168,6 +179,16 @@ function App() {
     skillGroups.find((group) => group.title === activeSkill) ?? skillGroups[0]
 
   useEffect(() => {
+    const sectionIds = [
+      'home',
+      'experience',
+      'skills',
+      'projects',
+      'education',
+      'resume',
+      'contact',
+    ]
+
     const handleScroll = () => {
       const scrollableHeight =
         document.documentElement.scrollHeight - window.innerHeight
@@ -178,6 +199,33 @@ function App() {
       }
 
       setScrollProgress(window.scrollY / scrollableHeight)
+
+      if (Date.now() < scrollSyncPausedUntilRef.current) {
+        return
+      }
+
+      const isAtPageBottom =
+        window.scrollY + window.innerHeight >=
+        document.documentElement.scrollHeight - 4
+
+      if (isAtPageBottom) {
+        setActiveSection(sectionIds[sectionIds.length - 1])
+        return
+      }
+
+      const currentSection = sectionIds.reduce((current, sectionId) => {
+        const section = document.getElementById(sectionId)
+
+        if (!section) {
+          return current
+        }
+
+        const sectionTop = section.offsetTop - 120
+
+        return window.scrollY >= sectionTop ? sectionId : current
+      }, 'home')
+
+      setActiveSection(currentSection)
     }
 
     handleScroll()
@@ -185,6 +233,20 @@ function App() {
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const handleNavClick = (event, sectionId) => {
+    const section = document.getElementById(sectionId)
+
+    if (!section) {
+      return
+    }
+
+    event.preventDefault()
+    scrollSyncPausedUntilRef.current = Date.now() + 1100
+    setActiveSection(sectionId)
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.history.pushState(null, '', `#${sectionId}`)
+  }
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -203,12 +265,16 @@ function App() {
           Anand Mohan
         </a>
         <nav className="nav-links">
-          <a href="#experience">Experience</a>
-          <a href="#projects">Projects</a>
-          <a href="#skills">Skills</a>
-          <a href="#education">Education</a>
-          <a href="#resume">Resume</a>
-          <a href="#contact">Contact</a>
+          {navItems.map((item) => (
+            <a
+              className={activeSection === item.sectionId ? 'is-active' : ''}
+              href={`#${item.sectionId}`}
+              key={item.sectionId}
+              onClick={(event) => handleNavClick(event, item.sectionId)}
+            >
+              {item.label}
+            </a>
+          ))}
         </nav>
       </header>
 
