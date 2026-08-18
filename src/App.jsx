@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import heroImg from './assets/hero.png'
 import './App.css'
 
@@ -72,11 +73,13 @@ const experienceBullets = [
 
 const projects = [
   {
-    title: 'Verunt Insights',
+    title: 'Versant Insights',
     type: 'Business Monitoring Tool',
+    category: 'Dashboard',
     period: '2026 - Present',
     description:
       'Business monitoring and analytics interfaces for presenting metrics, performance indicators, and data insights through responsive dashboards.',
+    impact: 'Analytics dashboards, data insights, validated forms, and optimized rendering.',
     points: [
       'Built dashboard and analytics screens with reusable UI patterns.',
       'Managed REST API data with React Query and Axios.',
@@ -87,9 +90,11 @@ const projects = [
   {
     title: 'DS Guide',
     type: 'Marketplace',
+    category: 'Marketplace',
     period: '2025 - 2026',
     description:
       'Marketplace functionality with reusable UI patterns, application workflows, data tables, filters, and form-driven user journeys.',
+    impact: 'Marketplace workflows, data tables, filters, pagination, charts, and multilingual support.',
     points: [
       'Developed marketplace modules with React.js, JavaScript, HTML5, CSS3, and Ant Design.',
       'Implemented pagination, loading states, API responses, and error handling with Axios.',
@@ -100,9 +105,11 @@ const projects = [
   {
     title: 'Harken',
     type: 'Real Estate Evaluation Platform',
+    category: 'Real Estate',
     period: '2023 - 2025',
     description:
       'Real estate evaluation workflows with dynamic forms, data tables, image handling, filters, property screens, and third-party API integration.',
+    impact: 'Property evaluation workflows, photo management, interactive maps, and responsive layouts.',
     points: [
       'Built reusable components for property evaluation, data entry, image management, and business workflows.',
       'Integrated internal and third-party REST APIs using Axios.',
@@ -135,8 +142,62 @@ const coreStrengths = [
 ]
 
 function App() {
+  const [activeProject, setActiveProject] = useState(projects[0].title)
+  const [projectFilter, setProjectFilter] = useState('All')
+  const [activeSkill, setActiveSkill] = useState(skillGroups[0].title)
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  const projectFilters = useMemo(
+    () => ['All', ...new Set(projects.map((project) => project.category))],
+    [],
+  )
+
+  const filteredProjects = useMemo(
+    () =>
+      projectFilter === 'All'
+        ? projects
+        : projects.filter((project) => project.category === projectFilter),
+    [projectFilter],
+  )
+
+  const selectedProject =
+    filteredProjects.find((project) => project.title === activeProject) ??
+    filteredProjects[0]
+
+  const selectedSkill =
+    skillGroups.find((group) => group.title === activeSkill) ?? skillGroups[0]
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollableHeight =
+        document.documentElement.scrollHeight - window.innerHeight
+
+      if (scrollableHeight <= 0) {
+        setScrollProgress(0)
+        return
+      }
+
+      setScrollProgress(window.scrollY / scrollableHeight)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <main className="portfolio">
+      <div
+        className="scroll-progress"
+        style={{ transform: `scaleX(${scrollProgress})` }}
+        aria-hidden="true"
+      />
+
       <header className="site-header" aria-label="Primary navigation">
         <a className="brand" href="#home" aria-label="Anand Mohan home">
           Anand Mohan
@@ -178,6 +239,10 @@ function App() {
               Contact Me
             </a>
           </div>
+          <div className="quick-contact" aria-label="Quick contact">
+            <a href={`tel:+91${profile.phone}`}>{profile.phone}</a>
+            <a href={`mailto:${profile.email}`}>{profile.email}</a>
+          </div>
         </div>
 
         <div className="hero-visual" aria-label="Developer profile preview">
@@ -190,6 +255,20 @@ function App() {
             <div className="panel-card">
               <strong>3 years</strong>
               <span>React.js, TypeScript, APIs, dashboards, forms, and scalable UI architecture.</span>
+            </div>
+            <div className="mini-dashboard" aria-label="Technical focus preview">
+              <span>
+                <strong>React</strong>
+                UI Architecture
+              </span>
+              <span>
+                <strong>APIs</strong>
+                Data Workflows
+              </span>
+              <span>
+                <strong>Perf</strong>
+                Fast Rendering
+              </span>
             </div>
             <div className="availability-note">Available for React.js and frontend developer roles</div>
           </div>
@@ -245,17 +324,28 @@ function App() {
           <p className="eyebrow">Technical Skills</p>
           <h2>Modern frontend stack with practical production depth.</h2>
         </div>
-        <div className="skills-grid">
-          {skillGroups.map((group) => (
-            <article className="skill-card" key={group.title}>
-              <h3>{group.title}</h3>
-              <div>
-                {group.items.map((skill) => (
-                  <span key={skill}>{skill}</span>
-                ))}
-              </div>
-            </article>
-          ))}
+        <div className="skills-explorer">
+          <div className="skill-tabs" aria-label="Skill categories">
+            {skillGroups.map((group) => (
+              <button
+                className={group.title === activeSkill ? 'is-active' : ''}
+                key={group.title}
+                onClick={() => setActiveSkill(group.title)}
+                type="button"
+              >
+                {group.title}
+              </button>
+            ))}
+          </div>
+          <article className="skill-focus">
+            <p>Selected Skill Area</p>
+            <h3>{selectedSkill.title}</h3>
+            <div>
+              {selectedSkill.items.map((skill) => (
+                <span key={skill}>{skill}</span>
+              ))}
+            </div>
+          </article>
         </div>
       </section>
 
@@ -264,25 +354,92 @@ function App() {
           <p className="eyebrow">Projects</p>
           <h2>Resume-backed work across dashboards, marketplace, and real estate.</h2>
         </div>
-        <div className="projects-grid">
-          {projects.map((project) => (
-            <article className="project-card" key={project.title}>
-              <div className="project-topline">
-                <p>{project.type}</p>
-                <span>{project.period}</span>
-              </div>
-              <h3>{project.title}</h3>
-              <p className="project-description">{project.description}</p>
-              <ul className="detail-list compact">
-                {project.points.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-              <div className="project-stack">
-                {project.stack.map((tech) => (
-                  <small key={tech}>{tech}</small>
-                ))}
-              </div>
+        <div className="project-filter" aria-label="Project filters">
+          {projectFilters.map((filter) => (
+            <button
+              className={filter === projectFilter ? 'is-active' : ''}
+              key={filter}
+              onClick={() => {
+                setProjectFilter(filter)
+                setActiveProject(
+                  filter === 'All'
+                    ? projects[0].title
+                    : projects.find((project) => project.category === filter)
+                        .title,
+                )
+              }}
+              type="button"
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+        <div className="project-showcase">
+          <aside className="project-preview">
+            <p>{selectedProject.period}</p>
+            <h3>{selectedProject.title}</h3>
+            <span>{selectedProject.impact}</span>
+            <div className="preview-stack">
+              {selectedProject.stack.slice(0, 4).map((tech) => (
+                <small key={tech}>{tech}</small>
+              ))}
+            </div>
+          </aside>
+          <div className="projects-grid">
+            {filteredProjects.map((project) => (
+              <article
+                className={`project-card ${
+                  project.title === selectedProject.title ? 'is-selected' : ''
+                }`}
+                key={project.title}
+              >
+                <button
+                  className="project-select"
+                  onClick={() => setActiveProject(project.title)}
+                  type="button"
+                >
+                  View Details
+                </button>
+                <div className="project-topline">
+                  <p>{project.type}</p>
+                  <span>{project.period}</span>
+                </div>
+                <h3>{project.title}</h3>
+                <p className="project-description">{project.description}</p>
+                <ul className="detail-list compact">
+                  {project.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+                <div className="project-stack">
+                  {project.stack.map((tech) => (
+                    <small key={tech}>{tech}</small>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section workflow-section" aria-label="Working style">
+        <div className="section-heading">
+          <p className="eyebrow">How I Work</p>
+          <h2>From requirement to polished release.</h2>
+        </div>
+        <div className="workflow-grid">
+          {['Understand', 'Build', 'Optimize', 'Support'].map((step, index) => (
+            <article key={step}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{step}</h3>
+              <p>
+                {[
+                  'Clarify workflows, states, APIs, and user expectations before writing UI.',
+                  'Create reusable React components with clean state and predictable data flow.',
+                  'Improve loading, rendering, validation, and browser compatibility.',
+                  'Debug production issues and collaborate through Git-based release workflows.',
+                ][index]}
+              </p>
             </article>
           ))}
         </div>
@@ -359,6 +516,15 @@ function App() {
           </a>
         </div>
       </section>
+
+      <button
+        className={`back-to-top ${scrollProgress > 0.16 ? 'is-visible' : ''}`}
+        onClick={scrollToTop}
+        type="button"
+        aria-label="Back to top"
+      >
+        Top
+      </button>
     </main>
   )
 }
