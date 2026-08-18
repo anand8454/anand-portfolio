@@ -5,7 +5,7 @@ const profile = {
   name: 'Anand Mohan',
   title: 'React.js Developer - Frontend Developer',
   location: 'Mohali, Punjab',
-  phone: '8300342829',
+  phone: '8360342829',
   email: 'anandmohansai123@gmail.com',
   linkedin: 'https://www.linkedin.com/in/anand-mohan-140859220',
   resume: '/Anand_Mohan_Frontend_Developer_Resume.pdf',
@@ -188,7 +188,7 @@ function App() {
             </div>
             <img src={heroImg} alt="" />
             <div className="panel-card">
-              <strong>3+ years</strong>
+              <strong>3 years</strong>
               <span>React.js, TypeScript, APIs, dashboards, forms, and scalable UI architecture.</span>
             </div>
             <div className="availability-note">Available for React.js and frontend developer roles</div>
